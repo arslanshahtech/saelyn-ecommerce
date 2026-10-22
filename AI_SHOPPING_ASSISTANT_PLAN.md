@@ -45,3 +45,15 @@ Architecture audit complete. No application code has been changed for the assist
 - Verification so far: `npm run build` succeeded (1,663 modules transformed); backend syntax checks passed; local HTTP endpoint returned expected validation responses and real MongoDB-backed product recommendations for `black clothing under $100` and `What is in stock?`.
 - A `Show bags under $100` query returned no products because no matching in-stock bag exists at or below that budget in the current catalog; the endpoint correctly did not fabricate a result.
 - Remaining checkpoint: user should visually verify the widget on desktop and mobile, then try prompts and confirm product links work before this phase is committed.
+
+## Phase 3 — Step 3: Free-tier conversational AI integration
+
+- Added an optional Google Gemini API integration using the fixed model `gemini-3.5-flash-lite`; no SDK or additional package is required (Node's built-in `fetch` is used).
+- The API receives the customer's latest message, at most eight short recent conversation messages, and at most three matching catalog records. It does not receive account identity, order history, session tokens, addresses, or payment details.
+- Product cards continue to come from MongoDB queries. Gemini writes the conversational text, but the server returns only the products independently found in the real catalog.
+- The existing deterministic catalog assistant remains available when no API key is configured or the free-tier service fails / reaches quota. The code does not automatically switch to a paid model.
+- `GEMINI_API_KEY` is read only by the backend. A safe template is provided at `server/.env.example`; the real key belongs only in the ignored `server/.env` file.
+- Cost guardrail: use a Google AI Studio API key on a project with **no billing account linked** and do not upgrade the project. When the free quota is exhausted, the AI response may stop until quota resets; catalog fallback remains available. Free-tier limits can change.
+- Privacy note: Google's published Gemini API free-tier terms say submitted content may be used to improve its products. The assistant sends only the conversation text and limited catalog fields; customers should not enter sensitive personal data.
+- Verification: the user configured `GEMINI_API_KEY` in the backend `.env` without sharing the secret and manually tested a price-ceiling request plus a follow-up casual-outfit question. They confirmed that real catalog recommendations and budget filtering work; richer conversation quality is intentionally deferred to a later improvement pass.
+- Step 3 is accepted for the current release. Free-tier quota and provider availability remain outside the app's control; catalog fallback must remain functional.

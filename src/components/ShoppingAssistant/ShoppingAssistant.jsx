@@ -54,7 +54,11 @@ export default function ShoppingAssistant() {
     setIsSending(true);
 
     try {
-      const result = await sendAssistantMessage(message);
+      const history = messages
+        .filter((item) => item.id !== "welcome" && ["user", "assistant"].includes(item.role))
+        .slice(-8)
+        .map(({ role, text }) => ({ role, text }));
+      const result = await sendAssistantMessage(message, history);
       setMessages((current) => [...current, {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -124,7 +128,7 @@ export default function ShoppingAssistant() {
                       ))}
                     </div>
                   )}
-                  {message.mode === "catalog" && message.role === "assistant" && <span className="sa-chat-mode">Based on SAELYN's live catalog</span>}
+                  {message.role === "assistant" && message.mode && <span className="sa-chat-mode">{message.mode === "gemini" ? "AI conversation · grounded in live catalog" : "Catalog-based recommendations"}</span>}
                 </div>
               </article>
             ))}
