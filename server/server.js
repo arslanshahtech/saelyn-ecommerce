@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -10,6 +10,7 @@ const wishlistRoutes = require("./routes/wishlistRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const storeRoutes = require("./routes/storeRoutes");
+const assistantRoutes = require("./routes/assistantRoutes");
 
 const app = express();
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
@@ -37,6 +38,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/store", storeRoutes);
+app.use("/api/assistant", assistantRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);

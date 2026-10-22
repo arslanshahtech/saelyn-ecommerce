@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getPublicStoreSettings } from "./api/store.js";
 import "./components/StoreMaintenance.css";
@@ -27,6 +27,7 @@ import AuthPage from "./pages/AuthPage/AuthPage.jsx";
 import AccountPage from "./pages/AccountPage/AccountPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
+import ShoppingAssistant from "./components/ShoppingAssistant/ShoppingAssistant.jsx";
 
 function HomePage() {
   return (
@@ -85,6 +86,7 @@ function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
+      {!isAdminRoute && !isAuthRoute && <ShoppingAssistant />}
       {!isAdminRoute && <><Newsletter /><Footer /></>}
     </div>
   );
