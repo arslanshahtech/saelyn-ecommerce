@@ -314,32 +314,60 @@ export const products = [
 ];
 export const essentials = [
   {
-    id: 5,
+    id: 13,
     name: "The Essential Tee",
     price: "$49",
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
+    category: "Essentials",
+    colors: ["#F4F0E8", "#171717"],
+    sizes: ["S", "M", "L", "XL"],
+    description:
+      "A versatile essential tee with a clean silhouette and soft everyday comfort. Designed to be an easy foundation for a considered wardrobe.",
+    material: "Cotton Blend",
+    details: ["Classic crew neckline", "Soft everyday fabric", "Short sleeves", "Easy regular fit"],
   },
   {
-    id: 6,
+    id: 14,
     name: "Soft Structure Shirt",
     price: "$85",
     image:
       "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=900&q=85",
+    category: "Essentials",
+    colors: ["#D8CDBB", "#F4F0E8"],
+    sizes: ["S", "M", "L", "XL"],
+    description:
+      "A softly structured shirt with a timeless shape and understated finish. Made for everyday styling and effortless layering.",
+    material: "Cotton Blend",
+    details: ["Button-front closure", "Long sleeves", "Soft structured shape", "Versatile layering piece"],
   },
   {
-    id: 7,
+    id: 15,
     name: "Tailored Trouser",
     price: "$89",
     image:
       "https://i.pinimg.com/736x/4b/11/41/4b114171fb8885736292f8e850714740.jpg",
+    category: "Essentials",
+    colors: ["#171717", "#B9AA96"],
+    sizes: ["S", "M", "L", "XL"],
+    description:
+      "A tailored trouser with clean lines and a versatile silhouette, designed to move easily between everyday and elevated looks.",
+    material: "Cotton Twill",
+    details: ["Tailored silhouette", "Clean waistband", "Straight-leg shape", "Everyday versatile styling"],
   },
   {
-    id: 8,
+    id: 16,
     name: "Everyday Carryall",
     price: "$120",
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbuzgw9sPfFsjcl-SeDtCTqGuskJnSesWJJUnDPiU54w&s=10",
+    category: "Essentials",
+    colors: ["#171717", "#7D5D48"],
+    sizes: ["One Size"],
+    description:
+      "A spacious everyday carryall with a practical shape and understated look, designed to keep daily essentials close at hand.",
+    material: "Faux Leather",
+    details: ["Spacious main compartment", "Comfortable carry handles", "Durable construction", "Minimal detailing"],
   },
 ];
 

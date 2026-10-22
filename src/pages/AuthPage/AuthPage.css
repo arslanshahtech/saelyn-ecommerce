@@ -1,0 +1,108 @@
+.auth-page {
+  min-height: 65vh;
+  padding: clamp(42px, 8vw, 100px) 20px;
+  display: grid;
+  place-items: center;
+}
+.auth-card {
+  width: min(100%, 460px);
+  padding: clamp(24px, 5vw, 46px);
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.35);
+}
+.auth-card h1 {
+  font-size: clamp(40px, 5vw, 58px);
+  margin-bottom: 14px;
+}
+.auth-intro, .auth-status {
+  color: #62605b;
+  line-height: 1.7;
+}
+.auth-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+.auth-form label {
+  display: grid;
+  gap: 7px;
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.auth-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(11,11,11,.22);
+  border-radius: 0;
+  background: #fffdf9;
+  color: var(--color-black);
+  font-size: 14px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.auth-form input:focus {
+  outline: 2px solid var(--color-bronze);
+  outline-offset: 1px;
+}
+.auth-hint, .auth-optional {
+  color: #6d6962;
+  font-size: 11px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.auth-submit {
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid var(--color-black);
+  background: var(--color-black);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.auth-submit:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+.auth-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #b84a3b;
+  color: #8f2c21;
+  background: #fff4f1;
+}
+.auth-switch {
+  margin: 24px 0 12px;
+  text-align: center;
+}
+.auth-switch a, .auth-back {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.auth-back {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  color: #62605b;
+  font-size: 11px;
+}
+
+.auth-success {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #50745c;
+  color: #244a30;
+  background: #f2f8f2;
+  line-height: 1.6;
+}
+.auth-dev-reset {
+  padding: 12px;
+  border: 1px dashed var(--color-border);
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.auth-dev-reset p { margin: 0 0 6px; }
+.auth-dev-reset a { text-decoration: underline; text-underline-offset: 3px; }

@@ -15,6 +15,7 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "All");
+  const [selectedCollection, setSelectedCollection] = useState(searchParams.get("collection") || "");
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedMaterials, setSelectedMaterials] = useState([]);
@@ -39,6 +40,8 @@ export default function ShopPage() {
     setSearchQuery(searchParams.get("q") || "");
     const categoryFromUrl = searchParams.get("category");
     setSelectedCategory(categoryFromUrl && categories.includes(categoryFromUrl) ? categoryFromUrl : "All");
+    const collectionFromUrl = searchParams.get("collection");
+    setSelectedCollection(collectionFromUrl === "essentials" || collectionFromUrl === "new-in" ? collectionFromUrl : "");
   }, [searchParams]);
 
   useEffect(() => {
@@ -48,6 +51,10 @@ export default function ShopPage() {
   }, [minPrice, maxPrice, prices.length]);
 
   useEffect(() => {
+    // Pehle shared catalog load hone dein; warna initial empty state se
+    // request race ho sakti hai aur Shop count 0 par reh sakta hai.
+    if (productsLoading) return;
+
     let active = true;
     const timer = setTimeout(() => {
       setRequestLoading(true);
@@ -55,6 +62,7 @@ export default function ShopPage() {
       const params = {
         search: searchQuery.trim(),
         category: selectedCategory !== "All" ? selectedCategory : undefined,
+        collection: selectedCollection || undefined,
         minPrice: effectiveMinPrice > minPrice ? effectiveMinPrice : undefined,
         maxPrice: effectiveMaxPrice < maxPrice ? effectiveMaxPrice : undefined,
         color: selectedColors,
@@ -68,7 +76,7 @@ export default function ShopPage() {
         .finally(() => { if (active) setRequestLoading(false); });
     }, searchQuery.trim() ? 250 : 0);
     return () => { active = false; clearTimeout(timer); };
-  }, [searchQuery, selectedCategory, selectedColors, selectedSizes, selectedMaterials, effectiveMinPrice, effectiveMaxPrice, minPrice, maxPrice, sortOption]);
+  }, [productsLoading, searchQuery, selectedCategory, selectedCollection, selectedColors, selectedSizes, selectedMaterials, effectiveMinPrice, effectiveMaxPrice, minPrice, maxPrice, sortOption]);
 
   const handleSearchChange = (event) => {
     const value = event.target.value;
@@ -76,6 +84,7 @@ export default function ShopPage() {
     const next = {};
     if (value.trim()) next.q = value;
     if (selectedCategory !== "All") next.category = selectedCategory;
+    if (selectedCollection) next.collection = selectedCollection;
     setSearchParams(next, { replace: true });
   };
 
@@ -83,6 +92,7 @@ export default function ShopPage() {
     setSearchQuery("");
     const next = {};
     if (selectedCategory !== "All") next.category = selectedCategory;
+    if (selectedCollection) next.collection = selectedCollection;
     setSearchParams(next, { replace: true });
   };
 
@@ -91,6 +101,7 @@ export default function ShopPage() {
     setSelectedColors(colors);
     setSelectedSizes(sizes);
     setSelectedMaterials(materials);
+    setSelectedCollection("");
     setSelectedMinPrice(nextMin);
     setSelectedMaxPrice(nextMax);
     const next = {};
@@ -106,7 +117,9 @@ export default function ShopPage() {
     setSelectedMaterials([]);
     setSelectedMinPrice(minPrice);
     setSelectedMaxPrice(maxPrice);
-    setSearchParams(searchQuery.trim() ? { q: searchQuery.trim() } : {}, { replace: true });
+    const next = searchQuery.trim() ? { q: searchQuery.trim() } : {};
+    if (selectedCollection) next.collection = selectedCollection;
+    setSearchParams(next, { replace: true });
   };
 
   const activeFilterCount = (selectedCategory !== "All" ? 1 : 0) + selectedColors.length + selectedSizes.length + selectedMaterials.length + (effectiveMinPrice > minPrice || effectiveMaxPrice < maxPrice ? 1 : 0);

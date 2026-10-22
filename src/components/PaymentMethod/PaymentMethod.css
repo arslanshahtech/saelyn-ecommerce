@@ -83,3 +83,10 @@
 
   color: var(--color-muted);
 }
+.payment-option--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.payment-option--disabled:hover {
+  border-color: var(--color-stone);
+}

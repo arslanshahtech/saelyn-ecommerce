@@ -219,3 +219,14 @@
     font-size: 38px;
   }
 }
+.checkout-server-error {
+  padding: 12px 14px;
+  border: 1px solid #b84a3b;
+  color: #8f2c21;
+  background: #fff4f1;
+  line-height: 1.5;
+}
+.checkout-mobile-submit:disabled {
+  opacity: .6;
+  cursor: wait;
+}

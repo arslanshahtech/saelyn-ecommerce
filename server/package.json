@@ -1,27 +1,33 @@
-{
-  "name": "server",
-  "version": "1.0.0",
-  "description": "SAELYN Express and MongoDB API",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "seed": "node seedProducts.js",
-    "test:api": "node testProductApi.js",
-    "test:models": "node testDatabaseModels.js",
-    "test:indexes": "node testDatabaseIndexes.js",
-    "test:phase2": "npm run test:models && npm run test:indexes && npm run test:api"
-  },
-  "keywords": [],
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.4",
-    "express": "^5.2.1",
-    "mongoose": "^9.10.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
-  }
+﻿{
+    "name":  "server",
+    "version":  "1.0.0",
+    "description":  "SAELYN Express and MongoDB API",
+    "main":  "server.js",
+    "scripts":  {
+                    "start":  "node server.js",
+                    "dev":  "nodemon server.js",
+                    "seed":  "node seedProducts.js",
+                    "admin:promote":  "node promoteAdmin.js",
+                    "test:api":  "node testProductApi.js",
+                    "test:models":  "node testDatabaseModels.js",
+                    "test:indexes":  "node testDatabaseIndexes.js",
+                    "test:auth":  "node testAuthApi.js",
+                    "test:password-reset":  "node testPasswordReset.js",
+                    "test:phase2":  "npm run test:models \u0026\u0026 npm run test:indexes \u0026\u0026 npm run test:api",
+                    "test:phase3":  "npm run test:models \u0026\u0026 npm run test:indexes \u0026\u0026 npm run test:api \u0026\u0026 npm run test:auth \u0026\u0026 npm run test:password-reset"
+                },
+    "keywords":  [
+
+                 ],
+    "license":  "ISC",
+    "type":  "commonjs",
+    "dependencies":  {
+                         "cors":  "^2.8.6",
+                         "dotenv":  "^18.0.4",
+                         "express":  "^5.2.1",
+                         "mongoose":  "^9.10.2"
+                     },
+    "devDependencies":  {
+                            "nodemon":  "^3.1.14"
+                        }
 }

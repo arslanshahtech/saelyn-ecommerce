@@ -1,5 +1,4 @@
 const express = require("express");
-
 const {
   getProducts,
   getProductById,
@@ -7,48 +6,17 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controllers/productController");
-
+const { requireAuth, requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
 
+// Product browsing remains public.
+router.get("/", getProducts);
+router.get("/:id", getProductById);
 
-// =========================
-// PRODUCT ROUTES
-// =========================
-
-// GET all products
-router.get(
-  "/",
-  getProducts
-);
-
-
-// GET single product
-router.get(
-  "/:id",
-  getProductById
-);
-
-
-// CREATE product
-router.post(
-  "/",
-  createProduct
-);
-
-
-// UPDATE product
-router.put(
-  "/:id",
-  updateProduct
-);
-
-
-// DELETE product
-router.delete(
-  "/:id",
-  deleteProduct
-);
-
+// Only authenticated administrators may modify the catalog.
+router.post("/", requireAuth, requireAdmin, createProduct);
+router.put("/:id", requireAuth, requireAdmin, updateProduct);
+router.delete("/:id", requireAuth, requireAdmin, deleteProduct);
 
 module.exports = router;

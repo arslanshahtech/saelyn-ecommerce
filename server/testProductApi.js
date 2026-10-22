@@ -1,29 +1,71 @@
+require("dotenv").config();
 const assert = require("node:assert/strict");
-
-const API = process.env.API_BASE_URL || "http://localhost:5000/api/products";
-
-async function request(path = "", options = {}) {
-  const response = await fetch(`${API}${path}`, {
-    ...options,
-    headers: {
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers,
-    },
-  });
-  const payload = await response.json();
-  return { response, payload };
-}
+const mongoose = require("mongoose");
+const { app } = require("./server");
+const connectDB = require("./config/db");
+const Product = require("./models/Product");
+const User = require("./models/User");
+const Session = require("./models/Session");
 
 async function run() {
+  let server;
   let createdId;
+  let adminId;
+  let adminCookie = "";
   const marker = `SAELYN CRUD Test ${Date.now()}`;
+  const adminEmail = `phase3-admin-${Date.now()}@example.com`;
+  const adminPassword = "Phase3-admin-test-password-48";
+
+  async function request(base, path = "", options = {}, cookie = adminCookie) {
+    const response = await fetch(`${base}${path}`, {
+      ...options,
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(cookie ? { Cookie: cookie } : {}),
+        ...options.headers,
+      },
+    });
+    const payload = await response.json();
+    return { response, payload };
+  }
+
   try {
-    const list = await request();
+    await connectDB();
+    await Promise.all([Product.init(), User.init(), Session.init()]);
+    const admin = new User({ name: "Temporary Test Admin", email: adminEmail, password: adminPassword, role: "admin" });
+    await admin.save();
+    adminId = String(admin._id);
+
+    server = app.listen(0);
+    await new Promise((resolve, reject) => {
+      server.once("listening", resolve);
+      server.once("error", reject);
+    });
+    const root = `http://127.0.0.1:${server.address().port}/api`;
+    const API = `${root}/products`;
+
+    const deniedWrite = await request(API, "", {
+      method: "POST",
+      body: JSON.stringify({ name: "Unauthorized write" }),
+    }, "");
+    assert.equal(deniedWrite.response.status, 401, "anonymous product write should be rejected");
+    console.log("PASS product writes require authentication");
+
+    const login = await request(root, "/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: adminEmail, password: adminPassword }),
+    }, "");
+    assert.equal(login.response.status, 200, "temporary admin login should succeed");
+    adminCookie = (login.response.headers.get("set-cookie") || "").split(";")[0];
+    assert.ok(adminCookie.startsWith("saelyn_session="));
+    console.log("PASS catalog test authenticates as administrator");
+
+    const list = await request(API);
     assert.equal(list.response.status, 200, "GET all should return 200");
     assert.equal(list.payload.success, true, "GET all should succeed");
     console.log(`PASS GET all: ${list.payload.count} product(s)`);
 
-    const created = await request("", {
+    const created = await request(API, "", {
       method: "POST",
       body: JSON.stringify({
         name: marker,
@@ -43,32 +85,34 @@ async function run() {
     assert.equal(created.payload.success, true, "POST should succeed");
     createdId = created.payload.product._id;
     assert.ok(createdId, "POST should return MongoDB _id");
-    console.log(`PASS POST create: ${createdId}`);
+    console.log("PASS admin POST creates product");
 
-    const single = await request(`/${createdId}`);
+    const single = await request(API, `/${createdId}`);
     assert.equal(single.response.status, 200, "GET by id should return 200");
     assert.equal(single.payload.product.name, marker, "GET by id should return created product");
     console.log("PASS GET by ID: created product retrieved from MongoDB");
 
-    const filtered = await request(`?search=${encodeURIComponent(marker)}&category=Clothing&minPrice=70&maxPrice=90&color=%23F4F0E8&size=M&material=Linen&sort=price-low`);
+    const filtered = await request(API, `?search=${encodeURIComponent(marker)}&category=Clothing&minPrice=70&maxPrice=90&color=%23F4F0E8&size=M&material=Linen&sort=price-low`);
     assert.equal(filtered.response.status, 200, "filtered GET should return 200");
     assert.ok(filtered.payload.products.some((item) => item._id === createdId), "search/filter should include matching product");
     console.log("PASS backend search + category + price + color + size + material + sort");
 
-    const updated = await request(`/${createdId}`, {
+    const updated = await request(API, `/${createdId}`, {
       method: "PUT",
       body: JSON.stringify({ price: 85, stock: 9 }),
     });
     assert.equal(updated.response.status, 200, "PUT should return 200");
     assert.equal(updated.payload.product.price, 85, "PUT should update price");
     assert.equal(updated.payload.product.stock, 9, "PUT should update stock");
-    console.log("PASS PUT update: price and stock persisted");
+    console.log("PASS admin PUT update: price and stock persisted");
 
-    const deleted = await request(`/${createdId}`, { method: "DELETE" });
+    const deletedId = createdId;
+    const deleted = await request(API, `/${deletedId}`, { method: "DELETE" });
     assert.equal(deleted.response.status, 200, "DELETE should return 200");
-    console.log("PASS DELETE: product removed");
+    createdId = null;
+    console.log("PASS admin DELETE removes product");
 
-    const afterDelete = await request(`/${createdId}`);
+    const afterDelete = await request(API, `/${deletedId}`);
     assert.equal(afterDelete.response.status, 404, "deleted product should return 404");
     console.log("PASS DELETE verification: removed product returns 404");
     console.log("ALL PRODUCT API TESTS PASSED");
@@ -76,9 +120,13 @@ async function run() {
     console.error("PRODUCT API TEST FAILED:", error.message);
     process.exitCode = 1;
   } finally {
-    if (createdId) {
-      await request(`/${createdId}`, { method: "DELETE" }).catch(() => {});
+    if (createdId) await Product.deleteOne({ _id: createdId }).catch(() => {});
+    if (adminId) {
+      await Session.deleteMany({ user: adminId }).catch(() => {});
+      await User.deleteOne({ _id: adminId }).catch(() => {});
     }
+    if (server) await new Promise((resolve) => server.close(resolve));
+    await mongoose.disconnect().catch(() => {});
   }
 }
 
