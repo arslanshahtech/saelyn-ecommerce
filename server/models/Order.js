@@ -54,6 +54,10 @@ const orderItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: "Order item quantity must be a whole number.",
+      },
     },
   },
   {
@@ -87,6 +91,7 @@ const customerSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email address."],
     },
 
     phone: {
@@ -308,6 +313,27 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
+
+// Keep stored totals consistent with the immutable item price snapshots.
+orderSchema.pre("validate", function validateOrderTotals() {
+  if (Array.isArray(this.items) && this.items.length > 0) {
+    const calculatedSubtotal = Math.round(
+      this.items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 100
+    ) / 100;
+    const storedSubtotal = Math.round(Number(this.subtotal) * 100) / 100;
+
+    if (Number.isFinite(storedSubtotal) && storedSubtotal !== calculatedSubtotal) {
+      this.invalidate("subtotal", "Subtotal must equal the sum of item price multiplied by quantity.");
+    }
+
+    const calculatedTotal = Math.round((storedSubtotal + Number(this.shippingCost || 0)) * 100) / 100;
+    const storedTotal = Math.round(Number(this.total) * 100) / 100;
+
+    if (Number.isFinite(storedTotal) && storedTotal !== calculatedTotal) {
+      this.invalidate("total", "Total must equal subtotal plus shipping cost.");
+    }
+  }
+});
 
 const Order = mongoose.model(
   "Order",

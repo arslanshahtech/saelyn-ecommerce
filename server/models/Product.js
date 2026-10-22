@@ -49,6 +49,13 @@ const productSchema = new mongoose.Schema(
       ],
     },
 
+    // Homepage merchandising collection, separate from product category.
+    merchandisingCollection: {
+      type: String,
+      enum: ["new-in", "essentials"],
+      default: "new-in",
+    },
+
 
     // =========================
     // COLORS
