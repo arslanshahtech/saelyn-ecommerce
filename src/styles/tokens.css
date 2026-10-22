@@ -1,0 +1,29 @@
+/* Central tokens: adjust these to update the visual system consistently. */
+:root {
+  --color-ivory: #f4f0e8;
+  --color-black: #0b0b0b;
+  --color-charcoal: #171717;
+  --color-stone: #c8c0b5;
+  --color-bronze: #9a8365;
+  --color-white: #ffffff;
+  --color-muted: #6b665e;
+  --color-border: rgba(11, 11, 11, 0.16);
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Manrope", Arial, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-30: 120px;
+  --container-wide: 1440px;
+  --page-gutter: 48px;
+  --transition-fast: 180ms ease;
+}
+/* Project breakpoints: mobile <700, tablet 700–1023, small desktop 1024–1279, desktop 1280+. */

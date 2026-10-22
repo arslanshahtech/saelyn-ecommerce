@@ -1,0 +1,42 @@
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.section-heading h2 {
+  margin-bottom: 0;
+}
+.product-section {
+  padding-block: 18px 78px;
+}
+
+@media (max-width: 1024px) {
+  .product-section {
+    padding-bottom: 58px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-heading {
+    margin-bottom: 16px;
+  }
+  .section-heading h2 {
+    font-size: 28px;
+  }
+  .section-heading .eyebrow {
+    margin-bottom: 7px;
+  }  
+}
+
+@media (max-width: 480px) {
+   .section-heading {
+    margin-bottom: 16px;
+  }
+  .section-heading h2 {
+    font-size: 22px;
+  }
+  .section-heading .eyebrow {
+    margin-bottom: 7px;
+  }   
+}

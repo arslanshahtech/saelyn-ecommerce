@@ -1,0 +1,101 @@
+.editorial-intro {
+  display: grid;
+  grid-template-columns: 0.72fr 1.5fr;
+  align-items: center;
+  gap: 48px;
+  padding-block: 48px 64px;
+}
+.editorial-intro__copy {
+  max-width: 280px;
+}
+.editorial-intro__copy h2 {
+  font-size: 42px;
+}
+.editorial-intro__copy > p:not(.eyebrow) {
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+
+/* The New Edit: 2 images ko ek fixed-height grid mein rakho */
+.editorial-intro__images {
+  display: grid;
+
+  /* Dono images equal width mein rahengi */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  /* Grid ki single row available height ke andar rahegi */
+  grid-template-rows: minmax(0, 1fr);
+
+  gap: 12px;
+
+  /* Desktop par editorial images ki intended height */
+  height: 400px;
+  min-height: 0;
+
+  /* Images grid se bahar visual overflow na karein */
+  overflow: hidden;
+}
+
+/* Image ko grid cell ke andar constrain karo */
+.editorial-intro__images img {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  /* Image apni intrinsic size se grid ko expand na kare */
+  min-width: 0;
+  min-height: 0;
+
+  /* Original editorial design ka image crop preserve rahe */
+  object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+.editorial-intro {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 24px;
+  }
+  .editorial-intro__images {
+    height: 240px;
+  }
+  
+}
+
+@media (max-width: 768px) {
+  .editorial-intro {
+    display: block;
+    padding-block: 38px 40px;
+  }
+  .editorial-intro__copy {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  .editorial-intro__copy h2 {
+    font-size: 36px;
+  }
+  
+/* Mobile: same 2-column editorial layout, shorter height */
+.editorial-intro__images {
+  grid-template-rows: minmax(0, 1fr);
+  height: 280px;
+  gap: 8px;
+  min-height: 0;
+}  
+}
+
+@media (max-width: 600px) {
+   .editorial-intro {
+    display: block;
+    padding-block: 38px 40px;
+  }
+    .editorial-intro__copy {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  .editorial-intro__images{
+    grid-template-rows:minmax(0, 1fr) ;
+    height: 180px;
+    gap: 8px;
+    min-height: 0;
+  }
+}

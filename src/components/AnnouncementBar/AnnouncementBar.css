@@ -1,0 +1,37 @@
+.announcement {
+  min-height: 29px;
+  padding: 0 var(--page-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e9e3d9;
+  font-size: 9px;
+}
+.announcement div {
+  display: flex;
+  gap: 22px;
+  text-transform: uppercase;
+  font-size: 8px;
+}
+
+@media (max-width:1280px) {
+  .announcement {
+    min-height: 26px;
+  }
+  .announcement div {
+    gap: 12px;
+  }
+    
+}
+
+@media (max-width: 768px) {
+  .announcement {
+    justify-content: center;
+    padding: 7px 12px;
+    text-align: center;
+    font-size: 8px;
+  }
+  .announcement div {
+    display: none;
+  }    
+}
