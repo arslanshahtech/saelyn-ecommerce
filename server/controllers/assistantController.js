@@ -68,10 +68,18 @@ function isMatchingColor(product, color) {
   return (aliases[color] || [color]).some((alias) => actualColors.includes(alias) || actualText.includes(alias));
 }
 function isOwnerQuestion(message) {
-  const text = normalize(message).trim();
-  return /\\b(who|whose)\\b.*\\b(owner|owns|created|creator|founder|built|developed|made)\\b/i.test(text)
-    || /\\b(owner|creator|founder)\\b.*\\b(saelyn|website|you|this)\\b/i.test(text)
-    || hasTerm(text, ["who created you", "who made you", "who owns you", "who is your owner", "your creator", "your owner", "website owner", "who built you", "who developed you", "who owns this website", "who created saelyn", "who is the owner"]);
+  const text = normalize(message).trim().replace(/[^a-z0-9\s']/g, " ").replace(/\s+/g, " ");
+  const phrases = [
+    "who is your owner", "who's your owner", "who is the owner", "who owns saelyn",
+    "who owns this website", "who owns the website", "who created saelyn",
+    "who created this website", "who made saelyn", "who made you", "who created you",
+    "who built saelyn", "who built this website", "who developed saelyn",
+    "your owner", "your creator", "saelyn owner", "saelyn creator", "website owner",
+    "owner of saelyn", "creator of saelyn", "founder of saelyn",
+  ];
+  if (phrases.some((phrase) => text.includes(phrase))) return true;
+  return /\b(who|whose)\b.*\b(owner|owns|created|creator|founder|built|developed|made)\b/i.test(text)
+    || /\b(owner|creator|founder)\b.*\b(saelyn|website|you|this)\b/i.test(text);
 }
 function getCasualReply(message) {
   const text = normalize(message).trim();
@@ -84,7 +92,7 @@ function getCasualReply(message) {
   if (/^i love you[!.?, ]*$/i.test(text)) return "That’s very sweet of you 😊 I’m glad to keep you company and help make your SAELYN experience enjoyable.";
   if (/^(thanks|thank you)[!.?, ]*$/i.test(text)) return "You’re very welcome! 😊";
   if (/^(who are you|what are you)[!.?, ]*$/i.test(text)) return "I’m SAELYN’s AI assistant. I can have a conversation, answer questions, or help you find products whenever you want.";
-  if (/^(no|no thanks|not now|just chatting|i don't want anything|nothing|nah)[!.?, ]*$/i.test(text)) return "No problem at all 😊 We can just chat. What’s on your mind?";
+  if (/^(no|no thanks|not now|just chatting|i just want to chat|no thanks,? i just want to chat|i don't want anything|i do not want to buy anything|nothing|nah)[!.?, ]*$/i.test(text)) return "No problem at all 😊 We can just chat. What’s on your mind?";
   return null;
 }
 function isShoppingIntent(message, history = []) {
@@ -95,8 +103,8 @@ function isShoppingIntent(message, history = []) {
   return accepted && /^(yes|yeah|yep|sure|okay|ok|please|go ahead|show me|haan|han|ji|bilkul|zaroor)[.! ]*$/i.test(text);
 }
 function isGreetingOrCasual(message) {
-  const text = normalize(message).trim();
-  return /^(hi|hello|hey|hiya|salam|assalam(?:ualaikum|u alaikum)?|good morning|good afternoon|good evening|how are you|how are you doing|what's up|whats up|i love you|thanks|thank you|who are you)[!.?, ]*$/i.test(text);
+  const text = normalize(message).trim().replace(/[!.?,]+$/g, "").trim();
+  return /^(hi|hello|hey|hiya|salam|assalam(?:ualaikum|u alaikum)?|good morning|good afternoon|good evening|how are you|how are you doing|what's up|whats up|i love you|thanks|thank you|who are you|what are you|no|no thanks|no thanks,? i just want to chat|not now|just chatting|i just want to chat|i don't want anything|i do not want to buy anything|nothing|nah)$/i.test(text);
 }
 
 function buildReply(products, criteria, message) {
@@ -273,7 +281,7 @@ async function chat(req, res) {
       : casualReply || buildReply(matches, criteria, message);
     let mode = "catalog";
 
-    if (!ownerQuestion && !casualMessage && process.env.GEMINI_API_KEY) {
+    if (!ownerQuestion && !casualReply && !casualMessage && process.env.GEMINI_API_KEY) {
       try {
         reply = await getGeminiReply(message, history, matches);
         mode = "gemini";
@@ -283,7 +291,7 @@ async function chat(req, res) {
       }
     }
 
-    const shouldShowProducts = shoppingIntent && !ownerQuestion && !casualMessage;
+    const shouldShowProducts = shoppingIntent && !ownerQuestion && !casualMessage && !casualReply;
     return res.status(200).json({ success: true, mode, reply, products: shouldShowProducts ? matches : [] });
   } catch (error) {
     console.error("Shopping assistant catalog error:", error.message);

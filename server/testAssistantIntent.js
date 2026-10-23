@@ -16,6 +16,10 @@ assert.equal(isShoppingIntent("yes", [{ role: "assistant", text: "How are you do
 assert.equal(isOwnerQuestion("Who created you?"), true, "creator questions should use the trusted owner profile");
 assert.equal(isOwnerQuestion("Who is the owner of this website?"), true, "website owner questions should be recognized");
 assert.equal(isOwnerQuestion("Who is the owner of SAELYN?"), true, "SAELYN owner questions should be recognized");
+assert.equal(isOwnerQuestion("Who is your owner?"), true, "direct owner questions should be recognized");
+assert.equal(isOwnerQuestion("Who is SAELYN's owner?"), true, "possessive brand owner questions should be recognized");
+assert.equal(isGreetingOrCasual("No thanks, I just want to chat"), true, "declining shopping should be classified as casual");
+assert.equal(isShoppingIntent("No thanks, I just want to chat", [{ role: "assistant", text: "Would you like to explore our collection?" }]), false, "declining shopping must not trigger products");
 assert.match(getCasualReply("Hi"), /How’s your day going/, "greetings should receive a natural reply");
 assert.match(getCasualReply("no thanks"), /just chat/i, "declining shopping should keep the conversation casual");
 assert.match(getCasualReply("Who are you?"), /SAELYN/i, "identity questions should describe the SAELYN assistant");
