@@ -1,14 +1,14 @@
 .sa-assistant-launcher {
   position: fixed; right: 24px; bottom: 24px; z-index: 1200;
-  min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 11px;
-  padding: 0 19px; border: 1px solid var(--color-black); border-radius: 0;
+  width: 54px; height: 54px; min-height: 54px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; border: 1px solid var(--color-black); border-radius: 50%;
   background: var(--color-black); color: var(--color-white);
   box-shadow: 0 8px 28px rgba(11, 11, 11, .18); cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 .sa-assistant-launcher:hover { background: var(--color-bronze); border-color: var(--color-bronze); transform: translateY(-2px); }
-.sa-assistant-launcher span { font-size: 9px; font-weight: 600; letter-spacing: .12em; }
-.sa-assistant-launcher.is-open { width: 44px; min-height: 44px; padding: 0; }
+.sa-assistant-launcher .sa-assistant-launcher-label { position: absolute; right: -3px; bottom: -3px; display: grid; place-items: center; min-width: 20px; height: 17px; padding: 0 4px; border: 1px solid var(--color-ivory); border-radius: 10px; background: var(--color-bronze); color: #fff; font-size: 8px; font-weight: 700; letter-spacing: .02em; }
+.sa-assistant-launcher.is-open { width: 44px; height: 44px; min-height: 44px; padding: 0; }
 .sa-assistant-panel {
   position: fixed; right: 24px; bottom: 88px; z-index: 1199;
   width: min(410px, calc(100vw - 32px)); height: min(640px, calc(100dvh - 120px)); min-height: 390px;
@@ -23,7 +23,9 @@
 .sa-assistant-heading h2 { margin: 0 0 8px; font: 400 27px/1 var(--font-display); text-transform: none; }
 .sa-assistant-heading > span { display: flex; align-items: center; gap: 6px; color: var(--color-muted); font-size: 10px; }
 .sa-assistant-heading > span i { width: 6px; height: 6px; border-radius: 50%; background: #638268; }
-.sa-assistant-close { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid transparent; background: transparent; cursor: pointer; }
+.sa-assistant-close, .sa-assistant-clear { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border: 1px solid transparent; background: transparent; cursor: pointer; }
+.sa-assistant-clear { color: var(--color-muted); }
+.sa-assistant-clear:hover { border-color: var(--color-stone); color: var(--color-black); }
 .sa-assistant-close:hover { border-color: var(--color-stone); }
 .sa-assistant-messages { flex: 1; min-height: 0; overflow-y: auto; padding: 19px 15px 12px; overscroll-behavior: contain; }
 .sa-chat-message { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 16px; }
@@ -67,7 +69,7 @@
 @keyframes saAssistantPulse { to { opacity: .25; transform: translateY(-2px); } }
 @keyframes saAssistantEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 600px) {
-  .sa-assistant-launcher { right: 14px; bottom: 14px; min-height: 48px; padding: 0 14px; }
+  .sa-assistant-launcher { right: 14px; bottom: 14px; width: 50px; height: 50px; min-height: 50px; padding: 0; }
   .sa-assistant-panel { right: 8px; bottom: 72px; width: calc(100vw - 16px); height: min(650px, calc(100dvh - 92px)); min-height: 360px; }
   .sa-assistant-header { padding: 16px 14px 14px; }
   .sa-assistant-heading h2 { font-size: 24px; }

@@ -13,8 +13,9 @@
         "test:indexes": "node testDatabaseIndexes.js",
         "test:auth": "node testAuthApi.js",
         "test:password-reset": "node testPasswordReset.js",
+        "test:assistant-intent": "node testAssistantIntent.js",
         "test:phase2": "npm run test:models && npm run test:indexes && npm run test:api",
-        "test:phase3": "npm run test:models && npm run test:indexes && npm run test:api && npm run test:auth && npm run test:password-reset"
+        "test:phase3": "npm run test:models && npm run test:indexes && npm run test:api && npm run test:auth && npm run test:password-reset && npm run test:assistant-intent"
     },
     "keywords": [],
     "license": "ISC",

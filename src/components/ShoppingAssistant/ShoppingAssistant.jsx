@@ -1,15 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, ChevronDown, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Bot, ChevronDown, MessageCircle, Send, Sparkles, X, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sendAssistantMessage } from "../../api/assistant";
 import "./ShoppingAssistant.css";
 
 const QUICK_PROMPTS = ["Show bags under $100", "Black clothing", "What is in stock?"];
+const STORAGE_KEY = "saelyn-assistant-chat-v1";
 const WELCOME_MESSAGE = {
   id: "welcome",
   role: "assistant",
-  text: "Welcome to SAELYN. Tell me what you are looking for, and I’ll help you explore our current collection.",
+  text: "Hi! I’m your SAELYN assistant. I can chat with you or help you explore the collection whenever you like.",
 };
+function loadSavedMessages() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
+    if (Array.isArray(saved)) {
+      const valid = saved.filter((item) => item && ["user", "assistant"].includes(item.role) && typeof item.text === "string");
+      if (valid.length) return valid.slice(-60);
+    }
+  } catch { /* Storage may be unavailable; start with a fresh chat. */ }
+  return [WELCOME_MESSAGE];
+}
 
 function formatPrice(price) {
   const amount = Number(price);
@@ -21,7 +32,7 @@ function formatPrice(price) {
 export default function ShoppingAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState(loadSavedMessages);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef(null);
@@ -41,8 +52,21 @@ export default function ShoppingAssistant() {
   }, [isOpen]);
 
   useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-60)));
+    } catch { /* Chat remains usable if browser storage is full or disabled. */ }
+  }, [messages]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isSending]);
+
+  const clearConversation = () => {
+    const fresh = [{ ...WELCOME_MESSAGE, id: "welcome" }];
+    setMessages(fresh);
+    setError("");
+    try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* Ignore unavailable storage. */ }
+  };
 
   const sendMessage = async (rawMessage) => {
     const message = String(rawMessage || "").trim();
@@ -90,7 +114,7 @@ export default function ShoppingAssistant() {
         aria-controls="sa-shopping-assistant"
       >
         {isOpen ? <X size={21} /> : <MessageCircle size={21} />}
-        {!isOpen && <span>STYLE ASSISTANT</span>}
+        {!isOpen && <span className="sa-assistant-launcher-label">AI</span>}
       </button>
 
       {isOpen && (
@@ -98,10 +122,11 @@ export default function ShoppingAssistant() {
           <header className="sa-assistant-header">
             <div className="sa-assistant-brand-icon"><Sparkles size={17} /></div>
             <div className="sa-assistant-heading">
-              <p className="sa-assistant-eyebrow">PERSONAL SHOPPING</p>
-              <h2>Find your SAELYN.</h2>
-              <span><i /> Catalog assistant · Here to help</span>
+              <p className="sa-assistant-eyebrow">SAELYN · AI ASSISTANT</p>
+              <h2>Hi, I’m here to help.</h2>
+              <span><i /> Chat naturally · Shop when you want</span>
             </div>
+            <button className="sa-assistant-clear" type="button" onClick={clearConversation} aria-label="Clear saved conversation" title="Clear conversation"><Trash2 size={16} /></button>
             <button className="sa-assistant-close" type="button" onClick={() => setIsOpen(false)} aria-label="Minimize assistant"><ChevronDown size={19} /></button>
           </header>
 
