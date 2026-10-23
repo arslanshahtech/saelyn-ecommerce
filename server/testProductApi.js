@@ -97,6 +97,15 @@ async function run() {
     assert.ok(filtered.payload.products.some((item) => item._id === createdId), "search/filter should include matching product");
     console.log("PASS backend search + category + price + color + size + material + sort");
 
+    const invalidPrice = await request(API, "?minPrice=not-a-number");
+    assert.equal(invalidPrice.response.status, 400, "non-numeric price filters must be rejected");
+    const reversedPrice = await request(API, "?minPrice=100&maxPrice=10");
+    assert.equal(reversedPrice.response.status, 400, "reversed price ranges must be rejected");
+    const regexMaterial = await request(API, "?material=%28.%2A%29");
+    assert.equal(regexMaterial.response.status, 200, "regex characters in material filters must be treated literally");
+    assert.ok(!regexMaterial.payload.products.some((item) => item._id === createdId), "regex metacharacters must not act as a wildcard");
+    console.log("PASS invalid price filters rejected and material search treats regex input literally");
+
     const updated = await request(API, `/${createdId}`, {
       method: "PUT",
       body: JSON.stringify({ price: 85, stock: 9 }),

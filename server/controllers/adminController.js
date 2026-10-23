@@ -80,20 +80,33 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   if (!order) return res.status(404).json({ success: false, message: "Order not found." });
   const previous = order.orderStatus;
   const nextStatus = req.body.orderStatus;
-  if (previous === "cancelled" && nextStatus !== "cancelled") {
+  if (previous === nextStatus) {
+    return res.json({ success: true, message: "Order status is already set.", order });
+  }
+  if (previous === "cancelled") {
     return res.status(409).json({ success: false, message: "Cancelled orders cannot be reopened from the dashboard." });
   }
   if (nextStatus === "cancelled" && ["shipped", "delivered"].includes(previous)) {
     return res.status(409).json({ success: false, message: "Shipped or delivered orders cannot be cancelled here." });
   }
-  if (previous !== "cancelled" && nextStatus === "cancelled") {
-    for (const item of order.items) {
-      await Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } });
-    }
+
+  // Compare-and-set the prior status so concurrent admin requests cannot cancel
+  // the same order twice and return its inventory to stock more than once.
+  const updatedOrder = await Order.findOneAndUpdate(
+    { _id: order._id, orderStatus: previous },
+    { $set: { orderStatus: nextStatus } },
+    { new: true, runValidators: true }
+  );
+  if (!updatedOrder) {
+    return res.status(409).json({ success: false, message: "This order changed in another request. Refresh and try again." });
   }
-  order.orderStatus = nextStatus;
-  await order.save();
-  res.json({ success: true, message: "Order status updated.", order });
+
+  if (nextStatus === "cancelled") {
+    await Promise.all(updatedOrder.items.map((item) =>
+      Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } })
+    ));
+  }
+  res.json({ success: true, message: "Order status updated.", order: updatedOrder });
 });
 
 const listCustomers = asyncHandler(async (req, res) => {

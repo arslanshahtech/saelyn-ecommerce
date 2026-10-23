@@ -1,5 +1,18 @@
 const Product = require("../models/Product");
 
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const MAX_FILTER_VALUES = 20;
+
+function normalizeFilterValues(value, label) {
+  const values = Array.isArray(value) ? value : [value];
+  if (values.length > MAX_FILTER_VALUES || values.some((item) => typeof item !== "string" || item.length > 80)) {
+    const error = new Error(`${label} filter is invalid.`);
+    error.status = 400;
+    throw error;
+  }
+  return values.filter((item) => item.trim()).map((item) => item.trim());
+}
+
 // Search helpers: case-insensitive, singular/plural aware, and tolerant of
 // small typos such as "shrt" -> "shirt". Keep this server-side so the Search
 // Overlay and the full Shop page use the same behavior.
@@ -146,7 +159,20 @@ const getProducts = async (req, res) => {
 
     // Search is scored after applying the other filters so we can support
     // related terms and small spelling mistakes without unsafe regex input.
-    const normalizedSearch = typeof search === "string" ? search.trim() : "";
+    const normalizedSearch = typeof search === "string" ? search.trim().slice(0, 120) : "";
+    if (search !== undefined && typeof search !== "string") {
+      return res.status(400).json({ success: false, message: "Search query must be a string." });
+    }
+
+    const parsedMinPrice = minPrice === undefined || minPrice === "" ? undefined : Number(minPrice);
+    const parsedMaxPrice = maxPrice === undefined || maxPrice === "" ? undefined : Number(maxPrice);
+    if (
+      (parsedMinPrice !== undefined && (!Number.isFinite(parsedMinPrice) || parsedMinPrice < 0)) ||
+      (parsedMaxPrice !== undefined && (!Number.isFinite(parsedMaxPrice) || parsedMaxPrice < 0)) ||
+      (parsedMinPrice !== undefined && parsedMaxPrice !== undefined && parsedMinPrice > parsedMaxPrice)
+    ) {
+      return res.status(400).json({ success: false, message: "Please provide a valid price range." });
+    }
 
 
     // =========================
@@ -169,13 +195,8 @@ const getProducts = async (req, res) => {
     if (minPrice || maxPrice) {
       query.price = {};
 
-      if (minPrice !== undefined && minPrice !== "") {
-        query.price.$gte = Number(minPrice);
-      }
-
-      if (maxPrice !== undefined && maxPrice !== "") {
-        query.price.$lte = Number(maxPrice);
-      }
+      if (parsedMinPrice !== undefined) query.price.$gte = parsedMinPrice;
+      if (parsedMaxPrice !== undefined) query.price.$lte = parsedMaxPrice;
     }
 
 
@@ -184,8 +205,8 @@ const getProducts = async (req, res) => {
     // =========================
 
     if (color) {
-      const colors = Array.isArray(color) ? color : [color];
-      query.colors = { $in: colors };
+      const colors = normalizeFilterValues(color, "Color");
+      if (colors.length) query.colors = { $in: colors };
     }
 
 
@@ -194,8 +215,8 @@ const getProducts = async (req, res) => {
     // =========================
 
     if (size) {
-      const sizes = Array.isArray(size) ? size : [size];
-      query.sizes = { $in: sizes };
+      const sizes = normalizeFilterValues(size, "Size");
+      if (sizes.length) query.sizes = { $in: sizes };
     }
 
 
@@ -204,11 +225,13 @@ const getProducts = async (req, res) => {
     // =========================
 
     if (material) {
-      const materials = Array.isArray(material) ? material : [material];
-      query.$and = [
-        ...(query.$and || []),
-        { $or: materials.map((value) => ({ material: { $regex: value, $options: "i" } })) },
-      ];
+      const materials = normalizeFilterValues(material, "Material");
+      if (materials.length) {
+        query.$and = [
+          ...(query.$and || []),
+          { $or: materials.map((value) => ({ material: { $regex: escapeRegex(value), $options: "i" } })) },
+        ];
+      }
     }
 
 
@@ -275,9 +298,9 @@ const getProducts = async (req, res) => {
       error.message
     );
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
-      message: "Failed to fetch products.",
+      message: error.status ? error.message : "Failed to fetch products.",
     });
   }
 };

@@ -61,6 +61,9 @@ async function run() {
 
     const unauthenticated = await request(base, "/auth/me");
     assert.equal(unauthenticated.response.status, 401);
+    const malformedCookie = await request(base, "/auth/me", { headers: { Cookie: "saelyn_session=%E0%A4%A" } });
+    assert.equal(malformedCookie.response.status, 401, "malformed encoded cookies must fail closed without a server error");
+    console.log("PASS malformed session cookies are rejected safely");
     assert.equal((await request(base, "/cart")).response.status, 401);
     assert.equal((await request(base, "/wishlist")).response.status, 401);
     assert.equal((await request(base, "/orders/mine")).response.status, 401);
