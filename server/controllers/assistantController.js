@@ -68,7 +68,24 @@ function isMatchingColor(product, color) {
   return (aliases[color] || [color]).some((alias) => actualColors.includes(alias) || actualText.includes(alias));
 }
 function isOwnerQuestion(message) {
-  return hasTerm(normalize(message), ["who created you", "who made you", "who owns you", "who is your owner", "your creator", "your owner", "website owner", "who built you", "who developed you", "who owns this website", "who created saelyn", "who is the owner"]);
+  const text = normalize(message).trim();
+  return /\\b(who|whose)\\b.*\\b(owner|owns|created|creator|founder|built|developed|made)\\b/i.test(text)
+    || /\\b(owner|creator|founder)\\b.*\\b(saelyn|website|you|this)\\b/i.test(text)
+    || hasTerm(text, ["who created you", "who made you", "who owns you", "who is your owner", "your creator", "your owner", "website owner", "who built you", "who developed you", "who owns this website", "who created saelyn", "who is the owner"]);
+}
+function getCasualReply(message) {
+  const text = normalize(message).trim();
+  if (/^(hi|hello|hey|hiya|salam|assalam(?:ualaikum|u alaikum)?|good morning|good afternoon|good evening)[!.?, ]*$/i.test(text)) {
+    return "Hey! Welcome to SAELYN 😊 How’s your day going?";
+  }
+  if (/^(how are you|how are you doing|what's up|whats up)[!.?, ]*$/i.test(text)) {
+    return "I’m doing well, thanks for asking! 😊 How are you doing?";
+  }
+  if (/^i love you[!.?, ]*$/i.test(text)) return "That’s very sweet of you 😊 I’m glad to keep you company and help make your SAELYN experience enjoyable.";
+  if (/^(thanks|thank you)[!.?, ]*$/i.test(text)) return "You’re very welcome! 😊";
+  if (/^(who are you|what are you)[!.?, ]*$/i.test(text)) return "I’m SAELYN’s AI assistant. I can have a conversation, answer questions, or help you find products whenever you want.";
+  if (/^(no|no thanks|not now|just chatting|i don't want anything|nothing|nah)[!.?, ]*$/i.test(text)) return "No problem at all 😊 We can just chat. What’s on your mind?";
+  return null;
 }
 function isShoppingIntent(message, history = []) {
   const text = normalize(message);
@@ -214,6 +231,7 @@ async function chat(req, res) {
     const ownerQuestion = isOwnerQuestion(message);
     const shoppingIntent = isShoppingIntent(message, history);
     const casualMessage = isGreetingOrCasual(message);
+    const casualReply = getCasualReply(message);
     const category = findRequestedCategory(normalizedMessage);
     const color = findRequestedColor(normalizedMessage);
     const maxPrice = extractBudget(message);
@@ -251,8 +269,8 @@ async function chat(req, res) {
 
     const criteria = { category, color, maxPrice, inStock, material };
     let reply = ownerQuestion
-      ? "I’m the AI assistant for SAELYN (S-A-E-L-Y-N). The website was created and is owned by Arsalan Shah. You can find his public developer profile at https://github.com/arslanshahtech."
-      : buildReply(matches, criteria, message);
+      ? "SAELYN (S-A-E-L-Y-N) was created and is owned by Arsalan Shah. You can find his public developer profile at https://github.com/arslanshahtech."
+      : casualReply || buildReply(matches, criteria, message);
     let mode = "catalog";
 
     if (!ownerQuestion && !casualMessage && process.env.GEMINI_API_KEY) {
@@ -265,11 +283,12 @@ async function chat(req, res) {
       }
     }
 
-    return res.status(200).json({ success: true, mode, reply, products: matches });
+    const shouldShowProducts = shoppingIntent && !ownerQuestion && !casualMessage;
+    return res.status(200).json({ success: true, mode, reply, products: shouldShowProducts ? matches : [] });
   } catch (error) {
     console.error("Shopping assistant catalog error:", error.message);
     return res.status(500).json({ success: false, message: "Shopping assistant is temporarily unavailable. Please try again." });
   }
 }
 
-module.exports = { chat, isOwnerQuestion, isShoppingIntent, isGreetingOrCasual };
+module.exports = { chat, isOwnerQuestion, isShoppingIntent, isGreetingOrCasual, getCasualReply };

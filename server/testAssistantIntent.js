@@ -1,5 +1,5 @@
 const assert = require("node:assert/strict");
-const { isOwnerQuestion, isShoppingIntent, isGreetingOrCasual } = require("./controllers/assistantController");
+const { isOwnerQuestion, isShoppingIntent, isGreetingOrCasual, getCasualReply } = require("./controllers/assistantController");
 
 const greeting = "Hi!";
 assert.equal(isGreetingOrCasual(greeting), true, "greetings should be classified as casual");
@@ -15,5 +15,9 @@ assert.equal(isShoppingIntent("yes", [{ role: "assistant", text: "How are you do
 
 assert.equal(isOwnerQuestion("Who created you?"), true, "creator questions should use the trusted owner profile");
 assert.equal(isOwnerQuestion("Who is the owner of this website?"), true, "website owner questions should be recognized");
+assert.equal(isOwnerQuestion("Who is the owner of SAELYN?"), true, "SAELYN owner questions should be recognized");
+assert.match(getCasualReply("Hi"), /How’s your day going/, "greetings should receive a natural reply");
+assert.match(getCasualReply("no thanks"), /just chat/i, "declining shopping should keep the conversation casual");
+assert.match(getCasualReply("Who are you?"), /SAELYN/i, "identity questions should describe the SAELYN assistant");
 
 console.log("PASS assistant intent: greeting, casual chat, direct shopping, contextual yes/no and owner questions");
