@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useCart } from "../../context/CartContext";
+import { useNotifications } from "../../context/NotificationContext";
 import { getProductById } from "../../api/products";
 import AddToBagDrawer from "../../components/AddToBagDrawer/AddToBagDrawer";
 import "./ProductPage.css";
@@ -10,6 +11,7 @@ export default function ProductPage() {
   const { id } = useParams();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { notify } = useNotifications();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -61,6 +63,11 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor, quantity);
     setIsBagDrawerOpen(true);
+    notify(`${product.name} added to your bag.`);
+  };
+  const handleWishlistToggle = () => {
+    toggleWishlist(product);
+    notify(isWishlisted ? `${product.name} removed from your wishlist.` : `${product.name} saved to your wishlist.`);
   };
 
   return (
@@ -116,7 +123,7 @@ export default function ProductPage() {
           <div className="product-actions">
             <button type="button" className="product-actions__add" onClick={handleAddToCart} disabled={product.stock === 0}>Add to Bag</button>
             <button type="button" className={`product-actions__wishlist ${isWishlisted ? "is-active" : ""}`}
-              onClick={() => toggleWishlist(product)} aria-pressed={isWishlisted}>
+              onClick={handleWishlistToggle} aria-pressed={isWishlisted}>
               {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
             </button>
           </div>

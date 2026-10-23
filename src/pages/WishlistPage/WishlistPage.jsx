@@ -8,6 +8,7 @@ import {
 import {
   useWishlist,
 } from "../../context/WishlistContext";
+import { useNotifications } from "../../context/NotificationContext";
 
 import "./WishlistPage.css";
 
@@ -19,7 +20,11 @@ export default function WishlistPage() {
     wishlistCount,
     toggleWishlist,
   } = useWishlist();
-
+  const { notify } = useNotifications();
+  const removeWishlistItem = (product) => {
+    toggleWishlist(product);
+    notify(`${product.name} removed from your wishlist.`);
+  };
 
   // =========================
   // EMPTY WISHLIST
@@ -137,9 +142,7 @@ export default function WishlistPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  toggleWishlist(product)
-                }
+                onClick={() => removeWishlistItem(product)}
                 aria-label={`Remove ${product.name} from wishlist`}
               >
                 <Heart fill="currentColor" />

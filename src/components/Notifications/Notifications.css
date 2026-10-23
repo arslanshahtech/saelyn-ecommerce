@@ -1,0 +1,43 @@
+.notifications {
+  position: fixed;
+  z-index: 10000;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  gap: 10px;
+  width: min(390px, calc(100vw - 36px));
+  pointer-events: none;
+}
+.notification {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 12px 14px 16px;
+  color: #171714;
+  background: #fffefa;
+  border: 1px solid rgba(23, 23, 20, 0.16);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
+  pointer-events: auto;
+  animation: notification-enter 180ms ease-out;
+}
+.notification > svg { color: #477453; }
+.notification--error > svg { color: #a33b31; }
+.notification--info > svg { color: #74664a; }
+.notification p { margin: 0; font-size: 12px; line-height: 1.45; }
+.notification button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+@keyframes notification-enter {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notification { animation: none; }
+}

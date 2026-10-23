@@ -13,6 +13,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import { WishlistProvider } from "./context/WishlistContext.jsx";
 import { ProductsProvider } from "./context/ProductsContext.jsx";
+import { NotificationProvider } from "./context/NotificationContext.jsx";
 import NewInSection from "./components/NewInSection/NewInSection.jsx";
 import EditorialSection from "./components/EditorialSection/EditorialSection.jsx";
 import EssentialsSection from "./components/EssentialsSection/EssentialsSection.jsx";
@@ -97,14 +98,16 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ProductsProvider>
-        <WishlistProvider>
-          <CartProvider>
-            <BrowserRouter><AppRoutes /></BrowserRouter>
-          </CartProvider>
-        </WishlistProvider>
-      </ProductsProvider>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <ProductsProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <BrowserRouter><AppRoutes /></BrowserRouter>
+            </CartProvider>
+          </WishlistProvider>
+        </ProductsProvider>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
