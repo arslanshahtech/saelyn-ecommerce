@@ -7,7 +7,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useAuth } from "../../context/AuthContext";
 
-const links = ["New In", "Shop", "Collections", "Essentials", "Accessories", "Sale"];
+const links = [
+  { label: "New In", to: "/collections/new-in" },
+  { label: "Shop", to: "/shop" },
+  { label: "Collections", to: "/collections" },
+  { label: "Essentials", to: "/collections/essentials" },
+  { label: "Accessories", to: "/collections/accessories" },
+  { label: "Sale", to: "/collections/sale" },
+];
 
 export default function Navbar() {
   const { wishlistCount } = useWishlist();
@@ -46,13 +53,16 @@ export default function Navbar() {
         className={mobileMenuOpen ? "nav-links nav-links--open" : "nav-links"}
         aria-label="Main navigation"
       >
-        {links.map((x) =>
-          x === "Shop" ? (
-            <Link key={x} to="/shop" onClick={closeMobileMenu}>{x}</Link>
-          ) : (
-            <a key={x} href={"#" + x.toLowerCase().replaceAll(" ", "-")} onClick={closeMobileMenu}>{x}</a>
-          )
-        )}
+        {links.map((item) => (
+          <Link
+            key={item.label}
+            to={item.to}
+            onClick={closeMobileMenu}
+            aria-current={window.location.pathname === item.to ? "page" : undefined}
+          >
+            {item.label}
+          </Link>
+        ))}
       </nav>
       <div className="nav-actions">
         <button

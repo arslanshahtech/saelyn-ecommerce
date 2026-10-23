@@ -21,6 +21,7 @@ import BrandStorySection from "./components/BrandStorySection/BrandStorySection.
 import HeroSection from "./components/HeroSection/HeroSection.jsx";
 import CartPage from "./pages/CartPage/CartPage.jsx";
 import ShopPage from "./pages/ShopPage/ShopPage.jsx";
+import CollectionPage from "./pages/CollectionPage/CollectionPage.jsx";
 import WishlistPage from "./pages/WishlistPage/WishlistPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage/CheckoutPage.jsx";
 import AuthPage from "./pages/AuthPage/AuthPage.jsx";
@@ -75,6 +76,8 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/collections" element={<CollectionPage />} />
+        <Route path="/collections/:slug" element={<CollectionPage />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
