@@ -277,7 +277,7 @@ async function chat(req, res) {
 
     const criteria = { category, color, maxPrice, inStock, material };
     let reply = ownerQuestion
-      ? "SAELYN (S-A-E-L-Y-N) was created and is owned by Arsalan Shah. You can find his public developer profile at https://github.com/arslanshahtech."
+      ? "SAELYN was created and is owned by Arsalan Shah. You can find his public developer profile at https://github.com/arslanshahtech."
       : casualReply || buildReply(matches, criteria, message);
     let mode = "catalog";
 
