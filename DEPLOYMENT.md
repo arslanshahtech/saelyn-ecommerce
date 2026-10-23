@@ -53,3 +53,18 @@ Do not set `VITE_GEMINI_API_KEY` or expose the Gemini key to browser code. If us
 ## Cost and reliability notes
 
 Free hosting plans and free AI quotas can change, sleep, or have usage limits. Check the provider's current terms before choosing a plan. This setup does not automatically upgrade to paid hosting or a paid Gemini model. A free hosting service may sleep while idle, which can make the first request slow.
+
+## Render Blueprint deployment
+
+A `render.yaml` Blueprint is included for a single-origin first deployment.
+
+1. Push the latest `master` branch to GitHub.
+2. In Render, create a new Blueprint and connect `arslanshahtech/saelyn-ecommerce`.
+3. Review the service configuration from `render.yaml` and create the service.
+4. Set the private `MONGO_URI` value in Render to the intended MongoDB Atlas connection string. Do not paste it into GitHub files or commit it.
+5. Optionally set `GEMINI_API_KEY` as a private environment variable if Gemini assistant replies are desired; catalog fallback works without it.
+6. In MongoDB Atlas, permit the Render service to connect using the narrowest practical network access rule. Avoid a broad public allow-list unless you have consciously accepted that risk.
+7. Wait for deployment to finish, then verify `https://<your-render-service>/api/health` returns HTTP 200 and `database: "connected"`.
+8. Test registration/login/logout, product browsing, cart, wishlist, Cash on Delivery checkout, order history, admin authorization, and assistant behavior over HTTPS before sharing the URL publicly.
+
+The Blueprint cannot supply your Render account authorization or private database/API secrets. Those must be configured in the provider dashboard.

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: saelyn-ecommerce
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm --prefix server ci && npm run build
+    startCommand: npm --prefix server start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
